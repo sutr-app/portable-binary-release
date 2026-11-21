@@ -22,6 +22,23 @@ host_platform() {
   printf '%s-%s\n' "$(uname -s | tr '[:upper:]' '[:lower:]')" "$(uname -m)"
 }
 
+# expect_version_output <binary> <expected>: run `<binary> --version` and
+# fail unless it prints exactly <expected>.
+expect_version_output() {
+  local reported
+  reported=$("$1" --version) || die "$1: --version failed"
+  echo "version: ${reported}"
+  [[ "${reported}" == "$2" ]] || die "$1: reports '${reported}', expected '$2'"
+}
+
+# hand_over <env-name> <path> <version>: export <env-name>=<path> and set the
+# path and version outputs, as every install-* action does.
+hand_over() {
+  export_github_env "$1" "$2"
+  set_step_output path "$2"
+  set_step_output version "$3"
+}
+
 # export_github_env <name> <value>: make <name> available to later steps of a
 # GitHub Actions job; a no-op elsewhere.
 export_github_env() {

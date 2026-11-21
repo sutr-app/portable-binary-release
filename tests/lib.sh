@@ -34,3 +34,19 @@ finish() {
   [[ "${failures}" -eq 0 ]] || exit 1
   echo "PASS: $1"
 }
+
+# expect_verify <status> <description> [VAR=value...] -- <file...>: run
+# scripts/verify-binary.sh with the given settings, with STUB_DIR (when set)
+# first on PATH, and expect <status>.
+expect_verify() {
+  local expected=$1 description=$2 settings=()
+  shift 2
+  while [[ "$1" != -- ]]; do
+    settings+=("$1")
+    shift
+  done
+  shift
+  expect_status "${expected}" "${description}" \
+    env ${STUB_DIR:+PATH="${STUB_DIR}:${PATH}"} ${settings[@]+"${settings[@]}"} \
+    bash "${SCRIPTS_DIR}/verify-binary.sh" "$@"
+}

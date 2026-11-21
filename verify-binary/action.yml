@@ -1,0 +1,79 @@
+name: Verify binary
+description: >-
+  Check built binaries before they are published: format and architecture,
+  linkage, dynamic dependencies, the newest glibc / libstdc++ / macOS they
+  require, exported symbols, code signature and reported version. Run it on
+  the platform the binaries were built for.
+inputs:
+  files:
+    description: Files to check, one per line.
+    required: true
+  kind:
+    description: shared-library or executable.
+    required: true
+  linkage:
+    description: dynamic or static (Linux only).
+    required: false
+    default: dynamic
+  max-glibc:
+    description: >-
+      Highest GLIBC version allowed (required for dynamic Linux binaries); an
+      executable requiring no GLIBC version at all fails.
+    required: false
+    default: ''
+  max-glibcxx:
+    description: Highest GLIBCXX version allowed (checked when set).
+    required: false
+    default: ''
+  macos-deployment-target:
+    description: Highest minimum macOS version allowed (required on macOS).
+    required: false
+    default: ''
+  required-symbols:
+    description: Space-separated symbols that must be exported (C names).
+    required: false
+    default: ''
+  forbidden-deps:
+    description: >-
+      Space-separated globs matched against each dependency's file name;
+      libstd-* is always forbidden.
+    required: false
+    default: ''
+  allowed-deps:
+    description: >-
+      Space-separated globs every dependency must match (ELF soname, Mach-O
+      install name); not checked when empty.
+    required: false
+    default: ''
+  required-deps:
+    description: Space-separated dependency file names that must be present.
+    required: false
+    default: ''
+  expected-version:
+    description: >-
+      For executables: `<file> --version` must print "<file name>
+      <expected-version>".
+    required: false
+    default: ''
+  verify-codesign:
+    description: Check the code signature (macOS only).
+    required: false
+    default: 'true'
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        VERIFY_FILES: ${{ inputs.files }}
+        VERIFY_KIND: ${{ inputs.kind }}
+        VERIFY_LINKAGE: ${{ inputs.linkage }}
+        VERIFY_MAX_GLIBC: ${{ inputs.max-glibc }}
+        VERIFY_MAX_GLIBCXX: ${{ inputs.max-glibcxx }}
+        VERIFY_MACOS_DEPLOYMENT_TARGET: ${{ inputs.macos-deployment-target }}
+        VERIFY_REQUIRED_SYMBOLS: ${{ inputs.required-symbols }}
+        VERIFY_FORBIDDEN_DEPS: ${{ inputs.forbidden-deps }}
+        VERIFY_ALLOWED_DEPS: ${{ inputs.allowed-deps }}
+        VERIFY_REQUIRED_DEPS: ${{ inputs.required-deps }}
+        VERIFY_EXPECTED_VERSION: ${{ inputs.expected-version }}
+        VERIFY_CODESIGN: ${{ inputs.verify-codesign }}
+      run: '"${{ github.action_path }}/../scripts/verify-binary.sh"'

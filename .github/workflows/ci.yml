@@ -31,8 +31,38 @@ jobs:
         id: protoc
         uses: ./install-protoc
 
-      - name: Check the action's outputs
+      - name: Check install-protoc's outputs
         env:
           OUTPUT_PATH: ${{ steps.protoc.outputs.path }}
           OUTPUT_VERSION: ${{ steps.protoc.outputs.version }}
-        run: bash tests/check-install-protoc-outputs.sh "${OUTPUT_PATH}" "${OUTPUT_VERSION}"
+        run: bash tests/check-install-outputs.sh PROTOC "${OUTPUT_PATH}" "libprotoc ${OUTPUT_VERSION}"
+
+      # cargo-about is pinned for Linux only.
+      - name: Install cargo-about through the action
+        if: runner.os == 'Linux'
+        id: cargo-about
+        uses: ./install-cargo-about
+
+      - name: Check install-cargo-about's outputs
+        if: runner.os == 'Linux'
+        env:
+          OUTPUT_PATH: ${{ steps.cargo-about.outputs.path }}
+          OUTPUT_VERSION: ${{ steps.cargo-about.outputs.version }}
+        run: bash tests/check-install-outputs.sh CARGO_ABOUT "${OUTPUT_PATH}" "cargo-about ${OUTPUT_VERSION}"
+
+      - name: Build a binary to verify
+        run: |
+          mkdir -p "${RUNNER_TEMP}/fixture"
+          cc -DVERSION='"1.2.3"' -o "${RUNNER_TEMP}/fixture/server" tests/fixtures/server.c
+
+      # The limits are loose: the fixture is built with the runner's default
+      # toolchain. Only the system libraries may be linked.
+      - name: Verify the binary through the action
+        uses: ./verify-binary
+        with:
+          files: ${{ runner.temp }}/fixture/server
+          kind: executable
+          max-glibc: '99'
+          macos-deployment-target: '99'
+          allowed-deps: 'libc.so.6 ld-linux-* /usr/lib/*'
+          expected-version: 1.2.3

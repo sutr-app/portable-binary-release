@@ -37,12 +37,5 @@ fetch_pinned "${base_url}/${protoc_asset}" "${protoc_sha256}" "${work}/${protoc_
 
 mkdir -p "${dest}"
 unzip -q -o "${work}/${protoc_asset}" -d "${dest}"
-protoc="${dest}/bin/protoc"
-reported=$("${protoc}" --version) || die "${protoc} --version failed"
-echo "${reported}"
-[[ "${reported}" == "libprotoc ${PROTOC_VERSION}" ]] \
-  || die "installed protoc reports '${reported}', expected 'libprotoc ${PROTOC_VERSION}'"
-
-export_github_env PROTOC "${protoc}"
-set_step_output path "${protoc}"
-set_step_output version "${PROTOC_VERSION}"
+expect_version_output "${dest}/bin/protoc" "libprotoc ${PROTOC_VERSION}"
+hand_over PROTOC "${dest}/bin/protoc" "${PROTOC_VERSION}"
