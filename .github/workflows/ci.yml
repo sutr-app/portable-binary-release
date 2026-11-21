@@ -1,0 +1,38 @@
+name: CI
+
+# Runs the actions on every platform they support, including macOS, which the
+# offline tests can only stub. A release tag points at a commit pushed to main
+# in the same sync, so the run for main covers it.
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  test:
+    if: github.server_url == 'https://github.com'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The action steps below download the real releases.
+      - name: Test
+        run: bash tests/run.sh
+
+      - name: Install protoc through the action
+        id: protoc
+        uses: ./install-protoc
+
+      - name: Check the action's outputs
+        env:
+          OUTPUT_PATH: ${{ steps.protoc.outputs.path }}
+          OUTPUT_VERSION: ${{ steps.protoc.outputs.version }}
+        run: bash tests/check-install-protoc-outputs.sh "${OUTPUT_PATH}" "${OUTPUT_VERSION}"
