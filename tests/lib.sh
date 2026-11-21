@@ -29,6 +29,18 @@ expect_status() {
     || fail "${description}: exit ${actual}, expected ${expected}: $(cat "${work}/out")"
 }
 
+# expect_hand_over <env-name> <path>: the installer run just before exported
+# <env-name>=<path> to ${work}/github_env and set the path output in
+# ${work}/github_output. reset_hand_over empties both before a run.
+reset_hand_over() {
+  : >"${work}/github_env"
+  : >"${work}/github_output"
+}
+expect_hand_over() {
+  grep -Fxq "$1=$2" "${work}/github_env" || fail "$1 was not exported as $2: $(cat "${work}/github_env")"
+  grep -Fxq "path=$2" "${work}/github_output" || fail "the path output is not $2: $(cat "${work}/github_output")"
+}
+
 # finish <name>: exit non-zero when any check failed.
 finish() {
   [[ "${failures}" -eq 0 ]] || exit 1

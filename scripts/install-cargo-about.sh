@@ -37,7 +37,7 @@ trap 'rm -rf "${work}"' EXIT
 
 fetch_pinned "${base_url}/${asset}" "${cargo_about_sha256}" "${work}/${asset}"
 tar -C "${work}" -xzf "${work}/${asset}"
-mkdir -p "${dest}"
+dest=$(make_absolute_dir "${dest}")
 cp "${work}/${stage}/cargo-about" "${dest}/cargo-about"
 expect_version_output "${dest}/cargo-about" "cargo-about ${CARGO_ABOUT_VERSION}"
 hand_over CARGO_ABOUT "${dest}/cargo-about" "${CARGO_ABOUT_VERSION}"

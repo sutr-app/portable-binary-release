@@ -22,6 +22,13 @@ host_platform() {
   printf '%s-%s\n' "$(uname -s | tr '[:upper:]' '[:lower:]')" "$(uname -m)"
 }
 
+# make_absolute_dir <dir>: create <dir> and print its absolute path. What is
+# handed to later steps must not depend on the directory they run in.
+make_absolute_dir() {
+  mkdir -p "$1"
+  (cd "$1" && pwd)
+}
+
 # expect_version_output <binary> <expected>: run `<binary> --version` and
 # fail unless it prints exactly <expected>.
 expect_version_output() {

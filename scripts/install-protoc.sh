@@ -35,7 +35,7 @@ trap 'rm -rf "${work}"' EXIT
 
 fetch_pinned "${base_url}/${protoc_asset}" "${protoc_sha256}" "${work}/${protoc_asset}"
 
-mkdir -p "${dest}"
+dest=$(make_absolute_dir "${dest}")
 unzip -q -o "${work}/${protoc_asset}" -d "${dest}"
 expect_version_output "${dest}/bin/protoc" "libprotoc ${PROTOC_VERSION}"
 hand_over PROTOC "${dest}/bin/protoc" "${PROTOC_VERSION}"

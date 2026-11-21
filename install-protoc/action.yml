@@ -4,12 +4,14 @@ description: >-
   SHA-256, with no root privileges. Exports PROTOC with the installed path.
 inputs:
   dest:
-    description: Directory to install into (default $RUNNER_TEMP/protoc).
+    description: >-
+      Directory to install into (default $RUNNER_TEMP/protoc); a relative path
+      is taken from the workspace. PROTOC and the path output are absolute.
     required: false
     default: ''
 outputs:
   path:
-    description: Path of the installed protoc.
+    description: Absolute path of the installed protoc.
     value: ${{ steps.install.outputs.path }}
   version:
     description: The installed protoc version.

@@ -43,7 +43,7 @@ unless it matches.
 
 | Input | Default | Description |
 |---|---|---|
-| `dest` | `$RUNNER_TEMP/protoc` | Directory to install into |
+| `dest` | `$RUNNER_TEMP/protoc` | Directory to install into; a relative path is taken from the workspace (`$GITHUB_WORKSPACE`), and `PROTOC` / `path` are always absolute |
 
 | Output | Description |
 |---|---|
@@ -64,7 +64,7 @@ verified against the pinned SHA-256 first.
 
 | Input | Default | Description |
 |---|---|---|
-| `dest` | `$RUNNER_TEMP/cargo-about` | Directory to install into |
+| `dest` | `$RUNNER_TEMP/cargo-about` | Directory to install into; a relative path is taken from the workspace (`$GITHUB_WORKSPACE`), and `CARGO_ABOUT` / `path` are always absolute |
 
 | Output | Description |
 |---|---|

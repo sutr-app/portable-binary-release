@@ -31,7 +31,7 @@ action はリリースタグのコミットで固定し、タグはコメント�
 
 | 入力 | 既定 | 内容 |
 |---|---|---|
-| `dest` | `$RUNNER_TEMP/protoc` | 導入先のディレクトリ |
+| `dest` | `$RUNNER_TEMP/protoc` | 導入先のディレクトリ。相対パスはワークスペース (`$GITHUB_WORKSPACE`) からの相対で、`PROTOC` と `path` には常に絶対パスを書き出す |
 
 | 出力 | 内容 |
 |---|---|
@@ -49,7 +49,7 @@ action はリリースタグのコミットで固定し、タグはコメント�
 
 | 入力 | 既定 | 内容 |
 |---|---|---|
-| `dest` | `$RUNNER_TEMP/cargo-about` | 導入先のディレクトリ |
+| `dest` | `$RUNNER_TEMP/cargo-about` | 導入先のディレクトリ。相対パスはワークスペース (`$GITHUB_WORKSPACE`) からの相対で、`CARGO_ABOUT` と `path` には常に絶対パスを書き出す |
 
 | 出力 | 内容 |
 |---|---|

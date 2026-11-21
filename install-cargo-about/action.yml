@@ -5,12 +5,15 @@ description: >-
   installed path.
 inputs:
   dest:
-    description: Directory to install into (default $RUNNER_TEMP/cargo-about).
+    description: >-
+      Directory to install into (default $RUNNER_TEMP/cargo-about); a relative
+      path is taken from the workspace. CARGO_ABOUT and the path output are
+      absolute.
     required: false
     default: ''
 outputs:
   path:
-    description: Path of the installed cargo-about.
+    description: Absolute path of the installed cargo-about.
     value: ${{ steps.install.outputs.path }}
   version:
     description: The installed cargo-about version.

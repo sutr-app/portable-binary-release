@@ -60,15 +60,24 @@ for pinned in linux-x86_64:x86_64-unknown-linux-musl linux-aarch64:aarch64-unkno
 done
 
 pinned_install=$(copy_pinned_to "$(make_archive x86_64-unknown-linux-musl "${version}")")
-: >"${work}/github_env"
-: >"${work}/github_output"
+reset_hand_over
 expect_status 0 "a verified archive" \
   env GITHUB_ENV="${work}/github_env" GITHUB_OUTPUT="${work}/github_output" CARGO_ABOUT_PLATFORM=linux-x86_64 \
   bash "${pinned_install}" "${work}/out-ok"
 [[ -x "${work}/out-ok/cargo-about" ]] || fail "cargo-about was not installed"
-grep -Fxq "CARGO_ABOUT=${work}/out-ok/cargo-about" "${work}/github_env" || fail "CARGO_ABOUT was not exported to GITHUB_ENV"
-grep -Fxq "path=${work}/out-ok/cargo-about" "${work}/github_output" || fail "the path output was not written"
+expect_hand_over CARGO_ABOUT "${work}/out-ok/cargo-about"
 grep -Fxq "version=${version}" "${work}/github_output" || fail "the version output was not written"
+
+# A relative destination is handed over as an absolute path: later steps may
+# run from another directory.
+mkdir -p "${work}/cwd"
+reset_hand_over
+cd "${work}/cwd"
+expect_status 0 "a relative destination" \
+  env GITHUB_ENV="${work}/github_env" GITHUB_OUTPUT="${work}/github_output" CARGO_ABOUT_PLATFORM=linux-x86_64 \
+  bash "${pinned_install}" rel/cargo-about
+cd "${ROOT_DIR}"
+expect_hand_over CARGO_ABOUT "${work}/cwd/rel/cargo-about/cargo-about"
 
 mkdir -p "${work}/runner-temp"
 expect_status 0 "the default destination" \
